@@ -10,54 +10,51 @@ namespace design_pattern_exams
     {
         static void Main(string[] args)
         {
-            IOyuncak oyuncak = OyuncakFabrikasi.OyuncakYap("bebek");
-            oyuncak.Oyna();//çıktı: araba ile oynuyorsun
+            //singleton örneğini alalım
+            Singleton singleton1=Singleton.GetInstance();
+            singleton1.SingletonYap();  //çıktı: singleton işlemi gerçekleştiriliyor
+
+
+            Singleton singleton2=Singleton.GetInstance();
+            singleton2.SingletonYap();
+
+            Console.WriteLine(ReferenceEquals(singleton1, singleton2)
+                ? "singleton1 ve singleton2 aynı nesne"
+                : "singleton1 ve singleton2 farklı nesneler");
+
+            Console.ReadLine();
+
         }
 
-
-        //oyuncak için arayüz
-        public interface IOyuncak
+        public class Singleton
         {
-            void Oyna();
-        }
+            //singleton sınıfının tek örneğini saklamak için bir statik değişken
+            private static Singleton _instance;
 
-        //farklı türde oyuncaklar
-        public class ArabaOyuncak : IOyuncak
-        {
-            public void Oyna()
+
+            //özel yapıcı: dışarıdan yeni bir singleton nesnesini oluşturulamıyor
+            private Singleton()
             {
-                Console.WriteLine("araba ile oynuyorsun");
+                Console.WriteLine("singleton nesnesi oluşturuldu");
+            }
+
+            //singleton örneğine erişim sağlıyan public metot
+            public static Singleton GetInstance()
+            {
+                //eğer örnek daha önce oluşturulmadıysa, yeni bir örnek oluştur
+                if(_instance == null)
+                {
+                    _instance = new Singleton();
+                }
+                return _instance; //tekil örneği döndür
+            }
+
+
+            public void SingletonYap()
+            {
+                Console.WriteLine("singleton işlemi gerçekleştiriliyor.");
             }
         }
-
-        public class BebekOyuncak : IOyuncak
-        {
-            public void Oyna()
-            {
-                Console.WriteLine("bebek ile oynuyorsun");
-            }
-        }
-
-
-
-        //fabrika
-        public class OyuncakFabrikasi
-        {
-            public static IOyuncak OyuncakYap(string tur)
-            {
-                if (tur == "araba")
-                {
-                    return new ArabaOyuncak();
-                }
-                else if (tur == "bebek")
-                {
-                    return new BebekOyuncak();
-                }
-                else
-                {
-                    throw new Exception("bilinmiyen oyuncak türü");
-                }
-            }
-        }
+        
     }
 }
