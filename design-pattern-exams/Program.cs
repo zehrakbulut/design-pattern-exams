@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,51 +11,76 @@ namespace design_pattern_exams
     {
         static void Main(string[] args)
         {
-            //singleton örneğini alalım
-            Singleton singleton1=Singleton.GetInstance();
-            singleton1.SingletonYap();  //çıktı: singleton işlemi gerçekleştiriliyor
+            //pizzabuilder kullanarak yeni bir pizza oluştur
+            var pizza = new PizzaBuilder()
+                .HamurEkle("ince")
+                .PeynirEkle("kaşar")
+                .SosEkle("domates")
+                .MalzemeEkle("mısır")
+                .Build();  //pizzayı oluştur
 
-
-            Singleton singleton2=Singleton.GetInstance();
-            singleton2.SingletonYap();
-
-            Console.WriteLine(ReferenceEquals(singleton1, singleton2)
-                ? "singleton1 ve singleton2 aynı nesne"
-                : "singleton1 ve singleton2 farklı nesneler");
+            //oluşturulan pizza bilgilerini göster
+            pizza.BilgiVer();   
 
             Console.ReadLine();
 
         }
 
-        public class Singleton
+
+        public class Pizza
         {
-            //singleton sınıfının tek örneğini saklamak için bir statik değişken
-            private static Singleton _instance;
+            //pizzanın özellikleri
+            public string Hamur { get; set; }
+            public string Peynir { get; set; }
+            public string Sos { get; set; }
+            public string Malzeme { get; set; }
 
-
-            //özel yapıcı: dışarıdan yeni bir singleton nesnesini oluşturulamıyor
-            private Singleton()
-            {
-                Console.WriteLine("singleton nesnesi oluşturuldu");
-            }
-
-            //singleton örneğine erişim sağlıyan public metot
-            public static Singleton GetInstance()
-            {
-                //eğer örnek daha önce oluşturulmadıysa, yeni bir örnek oluştur
-                if(_instance == null)
-                {
-                    _instance = new Singleton();
-                }
-                return _instance; //tekil örneği döndür
-            }
-
-
-            public void SingletonYap()
-            {
-                Console.WriteLine("singleton işlemi gerçekleştiriliyor.");
-            }
+            //pizza bilgilerini ekrana yazdıran metod
+            public void BilgiVer() =>
+                Console.WriteLine($"Pizza: {Hamur},{Peynir},{Sos},{Malzeme}");
         }
+
+
+        public class PizzaBuilder
+        {
+            //yeni bir pizza nesnesi
+            private Pizza _pizza=new Pizza();
+
+            //hamur eklemek için metod
+            public PizzaBuilder HamurEkle(string hamur)
+            {
+                _pizza.Hamur = hamur; //hamuru ayarla
+                return this;          //builder'ı döndür
+            }
+
+
+            //peynir eklemek için metot
+            public PizzaBuilder PeynirEkle(string peynir)
+            {
+                _pizza.Peynir = peynir;
+                return this;
+            }
+
+
+            //sos eklemek için metot
+            public PizzaBuilder SosEkle(string sos)
+            {
+                _pizza.Sos= sos;
+                return this;
+            }
+
+
+            //malzeme eklemek için metot
+            public PizzaBuilder MalzemeEkle(string malzeme)
+            {
+                _pizza.Malzeme= malzeme;
+                return this;
+            }
+
+            //oluşturulan pizza nesnesini döndürme metodu
+            public Pizza Build() => _pizza;
+        }
+       
         
     }
 }
