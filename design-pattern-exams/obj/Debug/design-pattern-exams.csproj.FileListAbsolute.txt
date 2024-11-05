@@ -1,0 +1,7 @@
+C:\Users\excalıbur\source\repos\design-pattern-exams\design-pattern-exams\bin\Debug\design-pattern-exams.exe.config
+C:\Users\excalıbur\source\repos\design-pattern-exams\design-pattern-exams\bin\Debug\design-pattern-exams.exe
+C:\Users\excalıbur\source\repos\design-pattern-exams\design-pattern-exams\bin\Debug\design-pattern-exams.pdb
+C:\Users\excalıbur\source\repos\design-pattern-exams\design-pattern-exams\obj\Debug\design-pattern-exams.csproj.AssemblyReference.cache
+C:\Users\excalıbur\source\repos\design-pattern-exams\design-pattern-exams\obj\Debug\design-pattern-exams.csproj.CoreCompileInputs.cache
+C:\Users\excalıbur\source\repos\design-pattern-exams\design-pattern-exams\obj\Debug\design-pattern-exams.exe
+C:\Users\excalıbur\source\repos\design-pattern-exams\design-pattern-exams\obj\Debug\design-pattern-exams.pdb
