@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,46 +12,43 @@ namespace design_pattern_exams
     {
         static void Main(string[] args)
         {
-            //başlangıçta sade dondurma
-            IDondurma dondurma = new SadeDondurma();
+            ProxyInternet internet= new ProxyInternet();
 
-            //çikolata dekoratörü ile dondurmayı zenginleştir
-            dondurma = new CikolataDekorator(dondurma);
+            //izin verilen siteye bağlanma
+            internet.Baglan("google.com");
 
-            //sonucu ekrana yazdır
-            Console.WriteLine(dondurma.ServisEt());
+            //yasaklı bir siteye bağlanma   
+            internet.Baglan("yasaklisite.com");
 
             Console.ReadLine();
 
         }
 
-       public interface IDondurma
+        public class GercekInternet
         {
-            string ServisEt();
-        }
-
-        public class SadeDondurma: IDondurma
-        {
-            public string ServisEt()
+            public void Baglan(string url)
             {
-                return "sade dondurma";
+                Console.WriteLine($"{url} adresine bağlanıldı.");
             }
         }
 
-        //dondurmaya ekleme yapabiliceğimiz bir dekoratör sınıfı oluşturuyoruz
-        public class CikolataDekorator: IDondurma
+        public class ProxyInternet
         {
-            private readonly IDondurma _dondurma;
-            public CikolataDekorator(IDondurma dondurma)
-            {
-                _dondurma= dondurma;
-            }
+            private readonly GercekInternet _gercekInternet= new GercekInternet();
 
-            public string ServisEt()
+            public void Baglan(string url)
             {
-                return _dondurma.ServisEt() + " + çikolata";
+                //yasaklı site kontrolü
+                if (url == "yasaklisite.com")
+                {
+                    Console.WriteLine("bu siteye erişim yasaklandı");
+                }
+                else
+                {
+                    //gerçek internete bağlan
+                    _gercekInternet.Baglan(url);
+                }
             }
         }
-  
     }
 }
