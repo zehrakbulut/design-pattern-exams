@@ -1,44 +1,53 @@
-# Singleton Pattern Örneği - Ayar Yönetimi
+# Bridge Pattern Örneği - Cihaz Kontrolü
 
-Bu proje, **Singleton Pattern** tasarım desenini basit bir ayar yönetimi örneği üzerinden açıklamaktadır. Singleton Pattern, bir sınıftan yalnızca bir örneğin oluşturulmasını sağlayarak, bu örneğe global erişim imkanı tanır. 
+Bu proje, **Bridge Pattern** tasarım desenini bir cihaz kontrol sistemi örneği üzerinden açıklamaktadır. Bridge Pattern, soyutlama (abstraction) ve uygulama (implementation) arasındaki bağımsızlığı sağlayarak her iki kısmın birbirinden bağımsız olarak geliştirilebilmesini sağlar. Bu örnekte, farklı cihazları kontrol edebilen bir kumanda sistemi tasarlanmıştır.
 
-## Singleton Pattern Nedir?
+## Bridge Pattern Nedir?
 
-**Singleton Pattern** (Tekil Desen), bir sınıfın yalnızca bir örneğinin olmasını ve bu örneğe global erişim sağlamayı garanti eden bir tasarım desenidir. Bu desen, özellikle paylaşılan kaynakların yönetimi veya uygulama genelinde tekil nesnelerin kullanılması gereken durumlarda faydalıdır. Örneğin, bir uygulamada yalnızca bir adet ayar yönetimi nesnesi olması gerektiğinde kullanılır.
+**Bridge Pattern** (Köprü Deseni), soyutlama ve uygulama arasındaki bağı bağımsızlaştırmayı sağlayan bir yapısal tasarım desenidir. Bu desen, bir nesnenin soyutlanmış yönleri ile uygulamasını (örneğin bir kumanda ile farklı cihazları) birbirinden ayırarak her iki tarafın bağımsız olarak genişletilebilmesine olanak tanır. Örneğin, bir kumanda nesnesinin televizyon veya radyo gibi farklı cihazları kontrol etmesini sağlar.
 
 ## Projedeki Bileşenler
 
 Bu proje şu bileşenleri içerir:
 
-### 1. `Singleton` Sınıfı
+### 1. `Cihaz` Arabirimi
 
-Bu sınıf, tekil nesnenin saklandığı yerdir. `GetInstance()` metodu, sınıfın yalnızca bir örneğinin oluşturulmasını sağlayarak, bu örneğe erişim imkanı tanır. Özel yapıcı metodu sayesinde dışarıdan yeni bir nesne oluşturulamaz.
+`Cihaz` arabirimi, kontrol edilebilecek cihazlar için temel işlemleri (açma, kapatma, ses ayarlama) tanımlar. Bu arabirimi uygulayan her cihaz, bu işlemleri kendine özgü şekilde gerçekleştirebilir.
 
-### 2. `Main` Metodu
+### 2. `Televizyon` ve `Radyo` Sınıfları
 
-Bu metod, `Singleton` sınıfını kullanarak bir nesne oluşturmak ve bu nesne üzerinden işlem yapmak için kullanılır. Burada, Singleton nesnesi oluşturulacak ve onun metodları çağrılarak işlemler gerçekleştirilecektir.
+Bu sınıflar, `Cihaz` arabirimini implement eder ve kendi açma, kapama ve ses ayarlama özelliklerini içerir.
+
+### 3. `Kumanda` Sınıfı
+
+`Kumanda` sınıfı, bir `Cihaz` nesnesi alarak ona ait temel işlemleri gerçekleştiren bir yapıdır. `AcKapat()` metodu sayesinde bağlı olan cihazı açabilir veya kapatabilir.
+
+### 4. `GelismisKumanda` Sınıfı
+
+`GelismisKumanda`, `Kumanda` sınıfını genişletir ve ekstra olarak `SesAyarla` metodunu içerir. Bu sayede ses seviyesi ayarı gibi ileri düzey kontroller yapılabilir.
 
 ## Kullanım
 
 1. Projeyi Visual Studio'da açın.
 2. `Program.cs` dosyasındaki `Main()` metodunu çalıştırın.
-3. İlk kez bir Singleton nesnesi oluşturulacak ve `"singleton işlemi gerçekleştiriliyor."` çıktısını göreceksiniz. 
-4. İkinci kez nesne alındığında, aynı nesne dönecek ve yine aynı işlem gerçekleştirilecektir.
+3. `Televizyon` ve `Radyo` cihazlarını kontrol etmek için kumandaları kullanın.
+   - Televizyonu açıp kapatabilir, radyoyu açabilir ve ses seviyesini ayarlayabilirsiniz.
 
-## Neden Singleton Pattern Kullanılır?
+## Neden Bridge Pattern Kullanılır?
 
-Bu örnekte, `Singleton` sınıfı bir nesnenin tekil olmasını sağlıyor. Bu sayede:
+Bu örnekte, `Kumanda` ve `Cihaz` nesneleri arasındaki bağ bağımsız hale getirilmiştir. Bu sayede:
 
-- Uygulama içinde paylaşılan kaynaklar daha verimli bir şekilde yönetilir.
-- Tekil nesneye global erişim sağlanarak, her yerden aynı nesne kullanılabilir.
-- Kod daha düzenli ve okunabilir hale gelir; çünkü her yerde yeni nesne yaratma gerekliliği ortadan kalkar.
+- Yeni cihazlar eklendiğinde `Kumanda` yapısında bir değişiklik yapılmasına gerek kalmaz.
+- Farklı türde cihazları kontrol etmek için aynı kumanda yapısı kullanılabilir.
+- Uygulamanın esnekliği ve genişletilebilirliği artar; çünkü cihaz ve kumanda tarafları birbirinden bağımsız geliştirilmiştir.
 
 ## İleride Yapılabilecek Geliştirmeler
 
-Bu yapıya ek olarak, Singleton sınıfına farklı ayar metodları veya özellikleri ekleyebiliriz. Örneğin, Singleton nesnesine ayarları değiştiren bir metod eklemek, uygulamanızın ayar yönetimini daha da geliştirebilir.
+- Farklı cihaz türleri (örneğin klima veya akıllı lamba) eklenerek mevcut yapıya yeni cihazlar entegre edilebilir.
+- `GelismisKumanda` sınıfına kanal değiştirme gibi ekstra özellikler eklenebilir.
 
 ## Sonuç
 
-Bu proje, **Singleton Pattern**'i anlamanıza yardımcı olacak basit bir örnektir. Singleton Pattern, uygulama genelinde tekil nesnelerin yönetimini sağlamanın yanı sıra kodun yeniden kullanılabilirliğini artırmak için güçlü bir araçtır. Uygulamalarınızda bu deseni kullanarak, kodunuzu daha modüler ve yönetilebilir hale getirebilirsiniz.
+Bu proje, **Bridge Pattern**'i anlamanıza yardımcı olacak basit bir örnektir. Bridge Pattern, soyutlama ve uygulamanın bağımsız geliştirilmesine olanak tanıyarak, kodun esnekliğini ve yönetilebilirliğini artırmak için güçlü bir araçtır. Uygulamalarınızda bu deseni kullanarak, kodunuzu daha modüler ve genişletilebilir hale getirebilirsiniz.
 
 Saygılarımla 🧠👣👩🏻‍💻🙋🏼‍♀💐
