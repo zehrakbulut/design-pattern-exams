@@ -11,76 +11,47 @@ namespace design_pattern_exams
     {
         static void Main(string[] args)
         {
-            //pizzabuilder kullanarak yeni bir pizza oluştur
-            var pizza = new PizzaBuilder()
-                .HamurEkle("ince")
-                .PeynirEkle("kaşar")
-                .SosEkle("domates")
-                .MalzemeEkle("mısır")
-                .Build();  //pizzayı oluştur
+            //orijina bir kedi nesnesi oluşturuluyor.
+            Kedi orjinalKedi = new Kedi { Renk = "Siyah", Cins = "Van Kedisi" };
+            Console.WriteLine("Orijinal kedi");
+            orjinalKedi.BilgiVer();
 
-            //oluşturulan pizza bilgilerini göster
-            pizza.BilgiVer();   
+
+            //orijinal kedi nesnesini klonlıyarak yeni bir kedi nesnesi oluşturuluyor
+            Kedi kopyaKedi = orjinalKedi.Klonla();
+            Console.WriteLine("\nKopya Kedi");
+            kopyaKedi.BilgiVer();
+
+
+            //kopya üzerinden değişiklik yapılabilir, ancak orijinali etkilemez
+            kopyaKedi.Renk = "Beyaz";
+            Console.WriteLine("\nKopy Kedinin rengi değiştirildi");
+            kopyaKedi.BilgiVer();
+
+
+            Console.WriteLine("\nOrijinal Kedi: ");
+            orjinalKedi.BilgiVer(); //orijinal nesne değişmeden kalır!
 
             Console.ReadLine();
 
         }
 
-
-        public class Pizza
+        public class Kedi
         {
-            //pizzanın özellikleri
-            public string Hamur { get; set; }
-            public string Peynir { get; set; }
-            public string Sos { get; set; }
-            public string Malzeme { get; set; }
+            public string Renk { get; set; }
+            public string Cins { get; set; }
 
-            //pizza bilgilerini ekrana yazdıran metod
-            public void BilgiVer() =>
-                Console.WriteLine($"Pizza: {Hamur},{Peynir},{Sos},{Malzeme}");
+            //klonlu metodu, mevcut kedi nesnesinin yüzeysel bir kopyasını döndürür.
+            public Kedi Klonla()
+            {
+                return (Kedi)this.MemberwiseClone(); //aynı özelliklere sahip yeni bir kedi nesnesi oluşturur.
+            }
+
+            public void BilgiVer()
+            {
+                Console.WriteLine($"kedi özellikleri - renk: {Renk}, Cins: {Cins}");
+            }
         }
-
-
-        public class PizzaBuilder
-        {
-            //yeni bir pizza nesnesi
-            private Pizza _pizza=new Pizza();
-
-            //hamur eklemek için metod
-            public PizzaBuilder HamurEkle(string hamur)
-            {
-                _pizza.Hamur = hamur; //hamuru ayarla
-                return this;          //builder'ı döndür
-            }
-
-
-            //peynir eklemek için metot
-            public PizzaBuilder PeynirEkle(string peynir)
-            {
-                _pizza.Peynir = peynir;
-                return this;
-            }
-
-
-            //sos eklemek için metot
-            public PizzaBuilder SosEkle(string sos)
-            {
-                _pizza.Sos= sos;
-                return this;
-            }
-
-
-            //malzeme eklemek için metot
-            public PizzaBuilder MalzemeEkle(string malzeme)
-            {
-                _pizza.Malzeme= malzeme;
-                return this;
-            }
-
-            //oluşturulan pizza nesnesini döndürme metodu
-            public Pizza Build() => _pizza;
-        }
-       
-        
+  
     }
 }
