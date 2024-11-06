@@ -12,41 +12,65 @@ namespace design_pattern_exams
     {
         static void Main(string[] args)
         {
-            ProxyInternet internet= new ProxyInternet();
+            Klasor anaKlasor = new Klasor("Ana Klasör");
 
-            //izin verilen siteye bağlanma
-            internet.Baglan("google.com");
+            Dosya dosya1 = new Dosya("Dosya1.txt");
+            Dosya dosya2 = new Dosya("Dosya2.txt");
 
-            //yasaklı bir siteye bağlanma   
-            internet.Baglan("yasaklisite.com");
+            Klasor altKlasor = new Klasor("Alt Klasör");
+            altKlasor.Ekle(new Dosya("Dosya3.txt"));
+
+            anaKlasor.Ekle(dosya1);
+            anaKlasor.Ekle(dosya2);
+            anaKlasor.Ekle(altKlasor);
+
+            anaKlasor.Goster();
 
             Console.ReadLine();
 
         }
 
-        public class GercekInternet
+        public interface IDosya
         {
-            public void Baglan(string url)
+            void Goster();
+        }
+
+        public class Dosya: IDosya
+        {
+            private string _isim;
+
+            public Dosya(string isim)
             {
-                Console.WriteLine($"{url} adresine bağlanıldı.");
+                _isim = isim;
+            }
+
+            public void Goster()
+            {
+                Console.WriteLine(_isim);
             }
         }
 
-        public class ProxyInternet
+        public class Klasor : IDosya
         {
-            private readonly GercekInternet _gercekInternet= new GercekInternet();
+            private string _isim;
+            private List<IDosya> _dosyalar = new List<IDosya>();
 
-            public void Baglan(string url)
+            public Klasor(string isim)
             {
-                //yasaklı site kontrolü
-                if (url == "yasaklisite.com")
+                _isim = isim;
+            }
+
+            public void Ekle(IDosya dosya)
+            {
+                _dosyalar.Add(dosya);
+            }
+
+            public void Goster()
+            {
+                Console.WriteLine($"Klasör: {_isim}");
+                foreach(var dosya in _dosyalar)
                 {
-                    Console.WriteLine("bu siteye erişim yasaklandı");
-                }
-                else
-                {
-                    //gerçek internete bağlan
-                    _gercekInternet.Baglan(url);
+                    dosya.Goster();
                 }
             }
         }
