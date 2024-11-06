@@ -11,50 +11,49 @@ namespace design_pattern_exams
     {
         static void Main(string[] args)
         {
-            //Amerikan prizi Türk prizine uyumlu hale getiriliyor
-            ITurkPriz priz = new PrizAdapter(new AmerikanPriz());
-            priz.TakVeCalistir();
+            //Facade kullanarak tv'yi açıyoruz
+            TelevizyonFacade tv = new TelevizyonFacade();
+            tv.TelevizyonuAc();
 
             Console.ReadLine();
 
         }
 
-        //Türk prizini temsil eden arayüz
-       public interface ITurkPriz
+        public class Ekran
         {
-            void TakVeCalistir();
-        }
-
-
-        public class TurkPriz : ITurkPriz   //Türkiyedeki priz  
-        {
-            public void TakVeCalistir()
+            public void Ac()
             {
-                Console.WriteLine("Türk prizine bağlandınız");
+                Console.WriteLine("ekran açıldı");
             }
         }
 
-        public class AmerikanPriz        //Amerikan prizini temsil eden sınıf
-        { 
-            public void PlugIn()
+        public class Ses
+        {
+            public void Ayarla()
             {
-                Console.WriteLine("Amerikan prizine bağlandınız");
+                Console.WriteLine("ses ayarlandı");
             }
         }
 
-        //Adaptör sınıfı
-        public class PrizAdapter : ITurkPriz
+        public class Kanal
         {
-            private readonly AmerikanPriz _amerikanPriz;
-
-            public PrizAdapter(AmerikanPriz amerikanPriz)
+            public void Ayarla()
             {
-                _amerikanPriz = amerikanPriz;
+                Console.WriteLine("kanal ayarlandı");
             }
+        }
 
-            public void TakVeCalistir()
+        public class TelevizyonFacade  //bu sınıf tüm işlemleri tek bir arayüzle yönetir
+        {
+            private readonly Ekran _ekran=new Ekran();
+            private readonly Ses _ses=new Ses();
+            private readonly Kanal _kanal=new Kanal();
+
+            public void TelevizyonuAc()
             {
-                _amerikanPriz.PlugIn();
+                _ekran.Ac();
+                _ses.Ayarla();
+                _kanal.Ayarla();
             }
         }
   
