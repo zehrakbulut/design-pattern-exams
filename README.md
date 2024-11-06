@@ -10,17 +10,8 @@ Bu proje, **Prototype Pattern** tasarım desenini basit bir kedi klonlama örne�
 
 Bu proje şu bileşenleri içerir:
 
-### 1. `Pizza` Sınıfı
 
-Bu sınıf, pizzanın özelliklerini tutar. Aşağıdaki özellikleri içerir:
-- `Hamur`: Pizza hamuru türü.
-- `Peynir`: Kullanılan peynir türü.
-- `Sos`: Pizza üzerindeki sos.
-- `Malzeme`: Eklenen malzemeler.
-
-`BilgiVer` metodu, pizzanın bilgilerini konsola yazdırır.
-
-### 2. `Kedi` Sınıfı
+### 1. `Kedi` Sınıfı
 
 Kedi sınıfı, klonlanabilir özelliklere sahip bir kedi nesnesini temsil eder. Bu sınıf, kopyalama işlemini kolaylaştırmak için bir Klonla metodu sağlar ve şu özellikleri içerir:
 
@@ -28,11 +19,11 @@ Kedi sınıfı, klonlanabilir özelliklere sahip bir kedi nesnesini temsil eder.
 -`Cins`: Kedinin cinsi
 Ayrıca `BilgiVer` metodu ile kedi özellikleri ekrana yazdırılabilir.
 
-### 3. `Kedi.Klonla()` Metodu
+### 2. `Kedi.Klonla()` Metodu
 
 Bu metot, mevcut `Kedi` nesnesinin aynısını oluşturan klonlama fonksiyonudur. **Prototype Pattern** sayesinde, var olan bir nesne baz alınarak hızlıca aynı özelliklere sahip yeni bir nesne yaratılabilir. Bu metod, `MemberwiseClone()` kullanılarak yüzeysel bir kopya döndürür.
 
-### 4. `Main` Metodu
+### 3. `Main` Metodu
 
 `Main` metodu, `Kedi` sınıfını kullanarak bir orijinal kedi nesnesi oluşturur, ardından bu nesneyi klonlıyarak bir kopyasını alır ve üzerinde değişiklikler yapar. Bu sayede, klonlanan nesne orijinali etkilemeden kullanılabilir.
 
