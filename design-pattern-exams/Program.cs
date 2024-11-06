@@ -11,45 +11,67 @@ namespace design_pattern_exams
     {
         static void Main(string[] args)
         {
-            //orijina bir kedi nesnesi oluşturuluyor.
-            Kedi orjinalKedi = new Kedi { Renk = "Siyah", Cins = "Van Kedisi" };
-            Console.WriteLine("Orijinal kedi");
-            orjinalKedi.BilgiVer();
+            //bir inek fabrikası oluştur ve kullan
+            IHayvanFabrikasi fabrikasi = new InekFabrikasi();
+            IHayvan hayvan = fabrikasi.HayvanOlustur();
+            hayvan.SesCikar();
 
-
-            //orijinal kedi nesnesini klonlıyarak yeni bir kedi nesnesi oluşturuluyor
-            Kedi kopyaKedi = orjinalKedi.Klonla();
-            Console.WriteLine("\nKopya Kedi");
-            kopyaKedi.BilgiVer();
-
-
-            //kopya üzerinden değişiklik yapılabilir, ancak orijinali etkilemez
-            kopyaKedi.Renk = "Beyaz";
-            Console.WriteLine("\nKopy Kedinin rengi değiştirildi");
-            kopyaKedi.BilgiVer();
-
-
-            Console.WriteLine("\nOrijinal Kedi: ");
-            orjinalKedi.BilgiVer(); //orijinal nesne değişmeden kalır!
+            fabrikasi = new KediFabrikasi();
+            hayvan = fabrikasi.HayvanOlustur();
+            hayvan.SesCikar();
 
             Console.ReadLine();
 
         }
 
-        public class Kedi
+        //hayvan için soyut sınıf
+        public interface IHayvan
         {
-            public string Renk { get; set; }
-            public string Cins { get; set; }
+            void SesCikar();
+        }
 
-            //klonlu metodu, mevcut kedi nesnesinin yüzeysel bir kopyasını döndürür.
-            public Kedi Klonla()
+        //hayvan fabrikası için soyut sınıf
+        public interface IHayvanFabrikasi
+        {
+            IHayvan HayvanOlustur();
+        }
+
+
+        //inek sınıfı
+        public class Inek : IHayvan
+        {
+            public void SesCikar()
             {
-                return (Kedi)this.MemberwiseClone(); //aynı özelliklere sahip yeni bir kedi nesnesi oluşturur.
+                Console.WriteLine("möö!");
             }
+        }
 
-            public void BilgiVer()
+        //kedi sınıfı
+        public class Kedi: IHayvan
+        {
+            public void SesCikar()
             {
-                Console.WriteLine($"kedi özellikleri - renk: {Renk}, Cins: {Cins}");
+                Console.WriteLine("miyav!");
+            }
+        }
+
+
+        //inek fabrikası
+        public class InekFabrikasi: IHayvanFabrikasi
+        {
+            public IHayvan HayvanOlustur()
+            {
+                return new Inek();
+            }
+        }
+
+
+        //kedi fabrikası
+        public class KediFabrikasi: IHayvanFabrikasi
+        {
+            public IHayvan HayvanOlustur()
+            {
+                return new Kedi();
             }
         }
   
