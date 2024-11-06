@@ -11,67 +11,50 @@ namespace design_pattern_exams
     {
         static void Main(string[] args)
         {
-            //bir inek fabrikası oluştur ve kullan
-            IHayvanFabrikasi fabrikasi = new InekFabrikasi();
-            IHayvan hayvan = fabrikasi.HayvanOlustur();
-            hayvan.SesCikar();
-
-            fabrikasi = new KediFabrikasi();
-            hayvan = fabrikasi.HayvanOlustur();
-            hayvan.SesCikar();
+            //Amerikan prizi Türk prizine uyumlu hale getiriliyor
+            ITurkPriz priz = new PrizAdapter(new AmerikanPriz());
+            priz.TakVeCalistir();
 
             Console.ReadLine();
 
         }
 
-        //hayvan için soyut sınıf
-        public interface IHayvan
+        //Türk prizini temsil eden arayüz
+       public interface ITurkPriz
         {
-            void SesCikar();
-        }
-
-        //hayvan fabrikası için soyut sınıf
-        public interface IHayvanFabrikasi
-        {
-            IHayvan HayvanOlustur();
+            void TakVeCalistir();
         }
 
 
-        //inek sınıfı
-        public class Inek : IHayvan
+        public class TurkPriz : ITurkPriz   //Türkiyedeki priz  
         {
-            public void SesCikar()
+            public void TakVeCalistir()
             {
-                Console.WriteLine("möö!");
+                Console.WriteLine("Türk prizine bağlandınız");
             }
         }
 
-        //kedi sınıfı
-        public class Kedi: IHayvan
-        {
-            public void SesCikar()
+        public class AmerikanPriz        //Amerikan prizini temsil eden sınıf
+        { 
+            public void PlugIn()
             {
-                Console.WriteLine("miyav!");
+                Console.WriteLine("Amerikan prizine bağlandınız");
             }
         }
 
-
-        //inek fabrikası
-        public class InekFabrikasi: IHayvanFabrikasi
+        //Adaptör sınıfı
+        public class PrizAdapter : ITurkPriz
         {
-            public IHayvan HayvanOlustur()
+            private readonly AmerikanPriz _amerikanPriz;
+
+            public PrizAdapter(AmerikanPriz amerikanPriz)
             {
-                return new Inek();
+                _amerikanPriz = amerikanPriz;
             }
-        }
 
-
-        //kedi fabrikası
-        public class KediFabrikasi: IHayvanFabrikasi
-        {
-            public IHayvan HayvanOlustur()
+            public void TakVeCalistir()
             {
-                return new Kedi();
+                _amerikanPriz.PlugIn();
             }
         }
   
