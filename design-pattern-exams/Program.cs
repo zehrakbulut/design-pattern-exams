@@ -12,66 +12,122 @@ namespace design_pattern_exams
     {
         static void Main(string[] args)
         {
-            Klasor anaKlasor = new Klasor("Ana Klasör");
+            Cihaz televizyon = new Televizyon();
+            Cihaz radyo = new Radyo();
 
-            Dosya dosya1 = new Dosya("Dosya1.txt");
-            Dosya dosya2 = new Dosya("Dosya2.txt");
+            Kumanda tvKumanda = new Kumanda(televizyon);
+            GelismisKumanda radyoKumanda = new GelismisKumanda(radyo);
 
-            Klasor altKlasor = new Klasor("Alt Klasör");
-            altKlasor.Ekle(new Dosya("Dosya3.txt"));
+            //tv aç/kapat
+            tvKumanda.AcKapat();
 
-            anaKlasor.Ekle(dosya1);
-            anaKlasor.Ekle(dosya2);
-            anaKlasor.Ekle(altKlasor);
+            //radyoyu aç, ses seviyesini ayarla
+            radyoKumanda.AcKapat();
+            radyoKumanda.SesAyarla(5);
 
-            anaKlasor.Goster();
+            //tv'yi kapat
+            tvKumanda.AcKapat();
 
             Console.ReadLine();
 
         }
 
-        public interface IDosya
+        public interface Cihaz
         {
-            void Goster();
+            void Ac();
+            void Kapat();
+            void SesAyarla(int seviye);
+            bool AcikMi();
         }
 
-        public class Dosya: IDosya
+        public class Televizyon : Cihaz
         {
-            private string _isim;
-
-            public Dosya(string isim)
+            private bool acik = false;
+            private int sesSeviyesi = 0;
+            public void Ac()
             {
-                _isim = isim;
+                acik = true;
+                Console.WriteLine("televizyon açıldı");
             }
 
-            public void Goster()
+            public bool AcikMi()
             {
-                Console.WriteLine(_isim);
+                return acik;        
+            }
+
+            public void Kapat()
+            {
+                acik = false;
+                Console.WriteLine("televizyon kapandı");
+            }
+
+            public void SesAyarla(int seviye)
+            {
+                sesSeviyesi = seviye;
+                Console.WriteLine($"televizyon ses seviyesi {sesSeviyesi} olarak ayarlandı.");
             }
         }
 
-        public class Klasor : IDosya
+        public class Radyo : Cihaz
         {
-            private string _isim;
-            private List<IDosya> _dosyalar = new List<IDosya>();
+            private bool acik = false;
+            private int sesSeviyesi = 0;
 
-            public Klasor(string isim)
+            public void Ac()
             {
-                _isim = isim;
+                acik=true;
+                Console.WriteLine("radyo açıldı");
             }
 
-            public void Ekle(IDosya dosya)
+            public bool AcikMi()
             {
-                _dosyalar.Add(dosya);
+                return acik;
             }
 
-            public void Goster()
+            public void Kapat()
             {
-                Console.WriteLine($"Klasör: {_isim}");
-                foreach(var dosya in _dosyalar)
+                acik=false;
+                Console.WriteLine("radyo kapandı");
+            }
+
+            public void SesAyarla(int seviye)
+            {
+                sesSeviyesi = seviye;
+                Console.WriteLine($"Radyo ses seviyesi {sesSeviyesi} olarak ayarlandı");
+            }
+        }
+
+        public class Kumanda
+        {
+            protected Cihaz _cihaz;
+
+            public Kumanda(Cihaz cihaz)
+            {
+                _cihaz = cihaz;
+            }
+
+            public void AcKapat()
+            {
+                if (_cihaz.AcikMi())
                 {
-                    dosya.Goster();
+                    _cihaz.Kapat();
                 }
+                else
+                {
+                    _cihaz.Ac();
+                }
+            }
+        }
+
+        public class GelismisKumanda : Kumanda
+        {
+            public GelismisKumanda(Cihaz cihaz) : base(cihaz)
+            {
+            }
+
+            public void SesAyarla(int seviye)
+            {
+                _cihaz.SesAyarla(seviye);
             }
         }
     }
