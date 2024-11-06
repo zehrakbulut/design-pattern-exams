@@ -11,49 +11,44 @@ namespace design_pattern_exams
     {
         static void Main(string[] args)
         {
-            //Facade kullanarak tv'yi açıyoruz
-            TelevizyonFacade tv = new TelevizyonFacade();
-            tv.TelevizyonuAc();
+            //başlangıçta sade dondurma
+            IDondurma dondurma = new SadeDondurma();
+
+            //çikolata dekoratörü ile dondurmayı zenginleştir
+            dondurma = new CikolataDekorator(dondurma);
+
+            //sonucu ekrana yazdır
+            Console.WriteLine(dondurma.ServisEt());
 
             Console.ReadLine();
 
         }
 
-        public class Ekran
+       public interface IDondurma
         {
-            public void Ac()
+            string ServisEt();
+        }
+
+        public class SadeDondurma: IDondurma
+        {
+            public string ServisEt()
             {
-                Console.WriteLine("ekran açıldı");
+                return "sade dondurma";
             }
         }
 
-        public class Ses
+        //dondurmaya ekleme yapabiliceğimiz bir dekoratör sınıfı oluşturuyoruz
+        public class CikolataDekorator: IDondurma
         {
-            public void Ayarla()
+            private readonly IDondurma _dondurma;
+            public CikolataDekorator(IDondurma dondurma)
             {
-                Console.WriteLine("ses ayarlandı");
+                _dondurma= dondurma;
             }
-        }
 
-        public class Kanal
-        {
-            public void Ayarla()
+            public string ServisEt()
             {
-                Console.WriteLine("kanal ayarlandı");
-            }
-        }
-
-        public class TelevizyonFacade  //bu sınıf tüm işlemleri tek bir arayüzle yönetir
-        {
-            private readonly Ekran _ekran=new Ekran();
-            private readonly Ses _ses=new Ses();
-            private readonly Kanal _kanal=new Kanal();
-
-            public void TelevizyonuAc()
-            {
-                _ekran.Ac();
-                _ses.Ayarla();
-                _kanal.Ayarla();
+                return _dondurma.ServisEt() + " + çikolata";
             }
         }
   
