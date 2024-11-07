@@ -12,62 +12,58 @@ namespace design_pattern_exams
     {
         static void Main(string[] args)
         {
-            HavaDurumu havaDurumu = new HavaDurumu();
-            HaberKanal kanal1 = new HaberKanal("kanal 1");
-            HaberKanal kanal2 = new HaberKanal("kanal 2");
+            OdemeYapici odeme = new OdemeYapici(new KrediKartiOdeme());
+            odeme.OdemeYap(100);
 
-            havaDurumu.GozlemciEkle(kanal1);
-            havaDurumu.GozlemciEkle(kanal2);
-
-            havaDurumu.GuncelleHavaDurumu("bugün hava güneşli");
+            odeme.OdemeStratejisiAyarla(new NakitOdeme());
+            odeme.OdemeYap(100);
 
             Console.ReadLine();
 
         }
 
-        //gözlemci arayüzü
-        public interface IGozlemci
+        //ödeme stratejisi arayüzü
+        public interface IOdemeStratejisi
         {
-            void Guncelle(string mesaj);
+            void OdemeYap(decimal tutar);
         }
 
-        //haber kanalı
-        public class HaberKanal : IGozlemci
+        //kredi kartı ile ödeme
+        public class KrediKartiOdeme : IOdemeStratejisi
         {
-            private string _isim;
-
-            public HaberKanal(string isim)
+            public void OdemeYap(decimal tutar)
             {
-                _isim = isim;
-            }
-
-            public void Guncelle(string mesaj)
-            {
-                Console.WriteLine($"{_isim} kanalı güncellendi: {mesaj}");
+                Console.WriteLine($"kredi kartı ile {tutar} TL ödeme yapıldı");
             }
         }
 
-        //hava durumu
-        public class HavaDurumu
+        //nakit ödeme
+        public class NakitOdeme : IOdemeStratejisi
         {
-            private List<IGozlemci> gozlemciler = new List <IGozlemci>();
-
-            public void GozlemciEkle(IGozlemci gozlemci)
+            public void OdemeYap(decimal tutar)
             {
-                gozlemciler.Add(gozlemci);
+                Console.WriteLine($"nakit olarak {tutar} TL ödeme yapıldı");
+            }
+        }
+
+        //ödeme yapan sınıf
+        public class OdemeYapici
+        {
+            private IOdemeStratejisi _odemeStratejisi;
+
+            public OdemeYapici(IOdemeStratejisi odemeStratejisi)
+            {
+                _odemeStratejisi = odemeStratejisi;
             }
 
-            public void GozlemciSil(IGozlemci gozlemci)
+            public void OdemeYap(decimal tutar)
             {
-                gozlemciler.Remove(gozlemci);
+                _odemeStratejisi.OdemeYap(tutar);
             }
-            
-            public void GuncelleHavaDurumu(string mesaj)
+
+            public void OdemeStratejisiAyarla(IOdemeStratejisi yeniStrateji)
             {
-                foreach(var gozlemci in gozlemciler)
-                {
-                    gozlemci.Guncelle(mesaj);
-                }
+                _odemeStratejisi= yeniStrateji;
             }
         }
     }
