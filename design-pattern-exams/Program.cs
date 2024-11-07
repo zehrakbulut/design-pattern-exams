@@ -12,59 +12,44 @@ namespace design_pattern_exams
     {
         static void Main(string[] args)
         {
-            OdemeYapici odeme = new OdemeYapici(new KrediKartiOdeme());
-            odeme.OdemeYap(100);
-
-            odeme.OdemeStratejisiAyarla(new NakitOdeme());
-            odeme.OdemeYap(100);
-
+            Kumanda kumanda = new Kumanda();
+            kumanda.KomutUygula(new IsikAcKomut());
+            kumanda.KomutUygula(new IsikKapatKomut());
+           
             Console.ReadLine();
 
         }
 
-        //ödeme stratejisi arayüzü
-        public interface IOdemeStratejisi
+        public interface IKomut
         {
-            void OdemeYap(decimal tutar);
+            void Calistir();
         }
 
-        //kredi kartı ile ödeme
-        public class KrediKartiOdeme : IOdemeStratejisi
+        //ışığı açma komutu
+        public class IsikAcKomut : IKomut
         {
-            public void OdemeYap(decimal tutar)
+            public void Calistir()
             {
-                Console.WriteLine($"kredi kartı ile {tutar} TL ödeme yapıldı");
-            }
-        }
-
-        //nakit ödeme
-        public class NakitOdeme : IOdemeStratejisi
-        {
-            public void OdemeYap(decimal tutar)
-            {
-                Console.WriteLine($"nakit olarak {tutar} TL ödeme yapıldı");
+                Console.WriteLine("ışık açıldı");
             }
         }
 
-        //ödeme yapan sınıf
-        public class OdemeYapici
+        //ışığı kapama komutu
+        public class IsikKapatKomut : IKomut
         {
-            private IOdemeStratejisi _odemeStratejisi;
-
-            public OdemeYapici(IOdemeStratejisi odemeStratejisi)
+            public void Calistir()
             {
-                _odemeStratejisi = odemeStratejisi;
-            }
-
-            public void OdemeYap(decimal tutar)
-            {
-                _odemeStratejisi.OdemeYap(tutar);
-            }
-
-            public void OdemeStratejisiAyarla(IOdemeStratejisi yeniStrateji)
-            {
-                _odemeStratejisi= yeniStrateji;
+                Console.WriteLine("ışık kapandı");
             }
         }
+
+        public class Kumanda
+        {
+            public void KomutUygula(IKomut komut)
+            {
+                komut.Calistir();   
+            }
+        }
+
     }
 }
