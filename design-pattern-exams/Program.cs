@@ -7,88 +7,113 @@ namespace design_pattern_exams
     {
         static void Main(string[] args)
         {
-            // Oyun karakteri oluşturuluyor
-            GameCharacter character = new GameCharacter("Player1", 100, "Start");
+            MediaPlayerContext mediaPlayer = new MediaPlayerContext();
 
-            // Caretaker (bakıcı) nesnesi oluşturuluyor
-            GameCaretaker caretaker = new GameCaretaker();
-
-            caretaker.SaveState(character.SaveState());
-
-            // Karakterin durumu değiştiriliyor
-            character.Health = 80;
-            character.Position = "Battlefield";
-
-            caretaker.SaveState(character.SaveState());
-
-            // Durum geri alınıyor
-            character.RestoreState(caretaker.GetLastState());
-            Console.WriteLine($"Character Health: {character.Health}, Position: {character.Position}");
-
-            // En eski duruma geri dönülüyor
-            character.RestoreState(caretaker.GetLastState());
-            Console.WriteLine($"Character Health: {character.Health}, Position: {character.Position}");
+            mediaPlayer.Play();   // Başlangıç: Çalma moduna geç
+            mediaPlayer.Pause();  // Duraklat
+            mediaPlayer.Play();   // Devam et
+            mediaPlayer.Stop();   // Durdur
+            mediaPlayer.Pause();  // Hatalı kullanım, çünkü durdurulmuş durumda
 
             Console.ReadLine();
         }
 
-        public class GameCharacter
+        public class MediaPlayerContext
         {
-            public string Name { get; set; }
-            public int Health { get; set; }
-            public string Position { get; set; }
+            private IMediaPlayerState _state;
 
-            public GameCharacter(string name, int health, string position)
+            public MediaPlayerContext()
             {
-                Name = name;
-                Health = health;
-                Position = position;
+                _state = new StoppedState();  // Başlangıç durumu
             }
 
-            // Memento oluşturma
-            public Memento SaveState()
+            public void SetState(IMediaPlayerState state)
             {
-                return new Memento(Health, Position);
+                _state = state;
             }
 
-            // Memento ile durumu geri yükleme
-            public void RestoreState(Memento memento)
+            public void Play()
             {
-                this.Health = memento.Health;
-                this.Position = memento.Position;
+                _state.Play(this);
+            }
+
+            public void Pause()
+            {
+                _state.Pause(this);
+            }
+
+            public void Stop()
+            {
+                _state.Stop(this);
             }
         }
 
-        public class Memento
+        public interface IMediaPlayerState
         {
-            // İç durumu tutar
-            public int Health { get; private set; }
-            public string Position { get; private set; }
-
-            public Memento(int health, string position)
-            {
-                Health = health;
-                Position = position;
-            }
-        }
-
-        public class GameCaretaker
-        {
-            private Stack<Memento> _history = new Stack<Memento>();
-
-            // Durumu kaydetme
-            public void SaveState(Memento memento)
-            {
-                _history.Push(memento);
-            }
-
-            // En son kaydedilen durumu alma
-            public Memento GetLastState()
-            {
-                return _history.Count > 0 ? _history.Pop() : null;
-            }
+            void Play(MediaPlayerContext context);
+            void Pause(MediaPlayerContext context);
+            void Stop(MediaPlayerContext context);
         }
 
 
+        public class PlayingState : IMediaPlayerState
+        {
+            public void Play(MediaPlayerContext context)
+            {
+                Console.WriteLine("Already playing.");
+            }
+
+            public void Pause(MediaPlayerContext context)
+            {
+                Console.WriteLine("Pausing the media player.");
+                context.SetState(new PausedState());
+            }
+
+            public void Stop(MediaPlayerContext context)
+            {
+                Console.WriteLine("Stopping the media player.");
+                context.SetState(new StoppedState());
+            }
+        }
+
+
+        public class PausedState : IMediaPlayerState
+        {
+            public void Play(MediaPlayerContext context)
+            {
+                Console.WriteLine("Resuming the media player.");
+                context.SetState(new PlayingState());
+            }
+
+            public void Pause(MediaPlayerContext context)
+            {
+                Console.WriteLine("Already paused.");
+            }
+
+            public void Stop(MediaPlayerContext context)
+            {
+                Console.WriteLine("Stopping the media player from pause.");
+                context.SetState(new StoppedState());
+            }
+        }
+
+        public class StoppedState : IMediaPlayerState
+        {
+            public void Play(MediaPlayerContext context)
+            {
+                Console.WriteLine("Starting the media player.");
+                context.SetState(new PlayingState());
+            }
+
+            public void Pause(MediaPlayerContext context)
+            {
+                Console.WriteLine("Cannot pause. The media player is stopped.");
+            }
+
+            public void Stop(MediaPlayerContext context)
+            {
+                Console.WriteLine("Already stopped.");
+            }
+        }
     }
 }
