@@ -1,10 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace design_pattern_exams
 {
@@ -12,84 +7,77 @@ namespace design_pattern_exams
     {
         static void Main(string[] args)
         {
-            IIsleyici duzey3Isleyici = new Duzey3Isleyici();
-            IIsleyici duzey2Isleyici= new Duzey2Isleyici(duzey3Isleyici);
-            IIsleyici duzey1Isleyici= new Duzey1Isleyici(duzey2Isleyici);
+            // Koleksiyonu yaratıyoruz
+            Collection collection = new Collection();
 
-            //bir talep gönderiyoruz
-            int talepTutari = 3000;
-            duzey1Isleyici.TalepIste(talepTutari);
+            IIterator iterator = collection.CreateIterator();
 
-            //farklı bir talep gönderiyoruz
-            talepTutari = 7000;
-            duzey1Isleyici.TalepIste(talepTutari);
-           
+            while (iterator.HasNext())
+            {
+                Console.WriteLine(iterator.Next());
+            }
+
             Console.ReadLine();
         }
 
-        //isleyici(handler) arayüzü
-        public interface IIsleyici
+        // Koleksiyonun arayüzü
+        public interface IAggregate
         {
-            void TalepIste(int tutar);
+            IIterator CreateIterator(); // Yineleyici yaratmak için bir metod
         }
 
-        //somut isleyici   
-        public class Duzey1Isleyici : IIsleyici
+        // Koleksiyonun somut sınıfı
+        public class Collection : IAggregate
         {
-            private IIsleyici _sonrakiIsleyici;
+            private List<string> _items = new List<string>();
 
-            public Duzey1Isleyici(IIsleyici sonrakiIsleyici)
+            public Collection()
             {
-                _sonrakiIsleyici = sonrakiIsleyici;
+                _items.Add("elma");
+                _items.Add("armut");
+                _items.Add("muz");
+                _items.Add("çilek");
             }
 
-            public void TalepIste(int tutar)
+            public IIterator CreateIterator()
             {
-                if (tutar < 1000)
-                {
-                    Console.WriteLine($"Düzey1Isleyici: {tutar} tutarındaki talep işlendi.");
-                }
-                else if(_sonrakiIsleyici != null)
-                {
-                    _sonrakiIsleyici.TalepIste(tutar); //talebi bir sonraki işleyiciye gönder
-                }
+                return new ConcreteIterator(this); // Yineleyici döndür
             }
+
+            public int Count => _items.Count; // Koleksiyon eleman sayısı
+            public string this[int index] => _items[index]; // İndeksleyici
         }
 
-        public class Duzey2Isleyici : IIsleyici
+        // Yineleyici arayüzü
+        public interface IIterator
         {
-            private IIsleyici _sonrakiIsleyici;
-
-            public Duzey2Isleyici(IIsleyici sonrakiIsleyici)
-            {
-                _sonrakiIsleyici= sonrakiIsleyici;
-            }
-
-            public void TalepIste(int tutar)
-            {
-                if(tutar >= 1000 && tutar <5000)
-                {
-                    Console.WriteLine($"Duzey2Isleyici: {tutar} tutarındaki talep işlendi.");
-                }
-                else if(_sonrakiIsleyici != null)
-                {
-                    _sonrakiIsleyici.TalepIste(tutar);
-                }
-            }
+            bool HasNext(); // Bir sonraki eleman var mı?
+            object Next();  // Bir sonraki elemana geç
         }
 
-        public class Duzey3Isleyici : IIsleyici
+        // Somut Yineleyici
+        public class ConcreteIterator : IIterator
         {
-            public void TalepIste(int tutar)
+            private Collection _collection;
+            private int _current = 0;
+
+            public ConcreteIterator(Collection collection)
             {
-                if(tutar >= 5000)
+                _collection = collection;
+            }
+
+            public bool HasNext()
+            {
+                return _current < _collection.Count; // Sonraki eleman var mı?
+            }
+
+            public object Next()
+            {
+                if (HasNext())
                 {
-                    Console.WriteLine($"Duzey3Isleyici: {tutar} tutarındaki talep işlendi.");
+                    return _collection[_current++]; // Bir sonraki elemanı döndür
                 }
-                else
-                {
-                    Console.WriteLine("Bu tutar için bir işleyici mevcut değil.");
-                }
+                return null; // Sonraki eleman yoksa null döner
             }
         }
     }
