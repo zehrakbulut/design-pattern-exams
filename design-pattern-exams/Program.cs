@@ -12,66 +12,83 @@ namespace design_pattern_exams
     {
         static void Main(string[] args)
         {
-            SohbetArabulucu sohbet= new SohbetArabulucu();
-            Katilimci ayse = new Katilimci("Ayşe", sohbet);
-            Katilimci mehmet= new Katilimci("Mehmet",sohbet);
+            IIsleyici duzey3Isleyici = new Duzey3Isleyici();
+            IIsleyici duzey2Isleyici= new Duzey2Isleyici(duzey3Isleyici);
+            IIsleyici duzey1Isleyici= new Duzey1Isleyici(duzey2Isleyici);
 
-            sohbet.KatilimciEkle(ayse);
-            sohbet.KatilimciEkle(mehmet);
+            //bir talep gönderiyoruz
+            int talepTutari = 3000;
+            duzey1Isleyici.TalepIste(talepTutari);
 
-            ayse.MesajGonder("Selam");
+            //farklı bir talep gönderiyoruz
+            talepTutari = 7000;
+            duzey1Isleyici.TalepIste(talepTutari);
            
             Console.ReadLine();
-
         }
 
-        public interface IArabulucu
+        //isleyici(handler) arayüzü
+        public interface IIsleyici
         {
-            void MesajGonder(Katilimci gonderen, string mesaj);
+            void TalepIste(int tutar);
         }
 
-
-        //katılımcı sınıfı
-        public class Katilimci
+        //somut isleyici   
+        public class Duzey1Isleyici : IIsleyici
         {
-            private readonly IArabulucu _arabulucu;
-            public string Isim { get; }
+            private IIsleyici _sonrakiIsleyici;
 
-            public Katilimci(string isim, IArabulucu arabulucu)
+            public Duzey1Isleyici(IIsleyici sonrakiIsleyici)
             {
-                Isim= isim;
-                _arabulucu = arabulucu;
+                _sonrakiIsleyici = sonrakiIsleyici;
             }
 
-            public void MesajGonder(string mesaj)
+            public void TalepIste(int tutar)
             {
-                _arabulucu.MesajGonder(this,mesaj);
-            }
-
-            public void MesajAl(string mesaj)
-            {
-                Console.WriteLine($"{Isim} mesaj aldı: {mesaj}");
-            }
-        }
-
-
-        public class SohbetArabulucu: IArabulucu
-        {
-            private List<Katilimci> _katilimcilar =new List<Katilimci>();
-
-            public void KatilimciEkle(Katilimci katilimci)
-            {
-                _katilimcilar.Add(katilimci);
-            }
-
-            public void MesajGonder(Katilimci gonderen, string mesaj)
-            {
-                foreach(var katilimci in _katilimcilar)
+                if (tutar < 1000)
                 {
-                    if(katilimci != gonderen)
-                    {
-                        katilimci.MesajAl($"{gonderen.Isim}: {mesaj}");
-                    }
+                    Console.WriteLine($"Düzey1Isleyici: {tutar} tutarındaki talep işlendi.");
+                }
+                else if(_sonrakiIsleyici != null)
+                {
+                    _sonrakiIsleyici.TalepIste(tutar); //talebi bir sonraki işleyiciye gönder
+                }
+            }
+        }
+
+        public class Duzey2Isleyici : IIsleyici
+        {
+            private IIsleyici _sonrakiIsleyici;
+
+            public Duzey2Isleyici(IIsleyici sonrakiIsleyici)
+            {
+                _sonrakiIsleyici= sonrakiIsleyici;
+            }
+
+            public void TalepIste(int tutar)
+            {
+                if(tutar >= 1000 && tutar <5000)
+                {
+                    Console.WriteLine($"Duzey2Isleyici: {tutar} tutarındaki talep işlendi.");
+                }
+                else if(_sonrakiIsleyici != null)
+                {
+                    _sonrakiIsleyici.TalepIste(tutar);
+                }
+            }
+        }
+
+        public class Duzey3Isleyici : IIsleyici
+        {
+            public void TalepIste(int tutar)
+            {
+                if(tutar >= 5000)
+                {
+                    Console.WriteLine($"Duzey3Isleyici: {tutar} tutarındaki talep işlendi.");
+                }
+                else
+                {
+                    Console.WriteLine("Bu tutar için bir işleyici mevcut değil.");
                 }
             }
         }
