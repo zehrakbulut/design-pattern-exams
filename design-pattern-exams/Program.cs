@@ -7,112 +7,122 @@ namespace design_pattern_exams
     {
         static void Main(string[] args)
         {
-            MediaPlayerContext mediaPlayer = new MediaPlayerContext();
+            // Dosya sistemi oluşturma
+            var root = new Klasor("Root");
+            var subFolder1 = new Klasor("Documents");
+            var subFolder2 = new Klasor("Pictures");
 
-            mediaPlayer.Play();   // Başlangıç: Çalma moduna geç
-            mediaPlayer.Pause();  // Duraklat
-            mediaPlayer.Play();   // Devam et
-            mediaPlayer.Stop();   // Durdur
-            mediaPlayer.Pause();  // Hatalı kullanım, çünkü durdurulmuş durumda
+            root.Ekle(subFolder1);
+            root.Ekle(subFolder2);
+            subFolder1.Ekle(new Dosya("Resume.pdf", 120));
+            subFolder1.Ekle(new Dosya("CoverLetter.docx", 80));
+            subFolder2.Ekle(new Dosya("Vacation.png", 240));
+            subFolder2.Ekle(new Dosya("Profile.jpg", 150));
+
+            // Boyut hesaplama ziyaretçisini kullanma
+            var boyutHesaplaVisitor = new BoyutHesaplaVisitor();
+            root.Accept(boyutHesaplaVisitor);
+            Console.WriteLine($"Toplam Boyut: {boyutHesaplaVisitor.ToplamBoyut}KB");
+
+            // Detay görüntüleme ziyaretçisini kullanma
+            var detayGoruntuleVisitor = new DetayGoruntuleVisitor();
+            root.Accept(detayGoruntuleVisitor);
 
             Console.ReadLine();
         }
 
-        public class MediaPlayerContext
+        // Ziyaretçi Arayüzü
+        public interface IVisitor
         {
-            private IMediaPlayerState _state;
+            void Visit(Dosya dosya);
+            void Visit(Klasor klasor);
+        }
 
-            public MediaPlayerContext()
+        // Dosya Sistemi Elemanı Arayüzü
+        public interface IDosyaSistemiElemani
+        {
+            void Accept(IVisitor visitor);
+        }
+
+        // Dosya Sınıfı
+        public class Dosya : IDosyaSistemiElemani
+        {
+            public string Ad { get; set; }
+            public int Boyut { get; set; }
+
+            public Dosya(string ad, int boyut)
             {
-                _state = new StoppedState();  // Başlangıç durumu
+                Ad = ad;
+                Boyut = boyut;
             }
 
-            public void SetState(IMediaPlayerState state)
+            public void Accept(IVisitor visitor)
             {
-                _state = state;
-            }
-
-            public void Play()
-            {
-                _state.Play(this);
-            }
-
-            public void Pause()
-            {
-                _state.Pause(this);
-            }
-
-            public void Stop()
-            {
-                _state.Stop(this);
+                visitor.Visit(this);
             }
         }
 
-        public interface IMediaPlayerState
+        // Klasör Sınıfı
+        public class Klasor : IDosyaSistemiElemani
         {
-            void Play(MediaPlayerContext context);
-            void Pause(MediaPlayerContext context);
-            void Stop(MediaPlayerContext context);
-        }
+            public string Ad { get; set; }
+            public List<IDosyaSistemiElemani> Elemanlar { get; set; } = new List<IDosyaSistemiElemani>();
 
-
-        public class PlayingState : IMediaPlayerState
-        {
-            public void Play(MediaPlayerContext context)
+            public Klasor(string ad)
             {
-                Console.WriteLine("Already playing.");
+                Ad = ad;
             }
 
-            public void Pause(MediaPlayerContext context)
+            public void Ekle(IDosyaSistemiElemani eleman)
             {
-                Console.WriteLine("Pausing the media player.");
-                context.SetState(new PausedState());
+                Elemanlar.Add(eleman);
             }
 
-            public void Stop(MediaPlayerContext context)
+            public void Accept(IVisitor visitor)
             {
-                Console.WriteLine("Stopping the media player.");
-                context.SetState(new StoppedState());
-            }
-        }
-
-
-        public class PausedState : IMediaPlayerState
-        {
-            public void Play(MediaPlayerContext context)
-            {
-                Console.WriteLine("Resuming the media player.");
-                context.SetState(new PlayingState());
-            }
-
-            public void Pause(MediaPlayerContext context)
-            {
-                Console.WriteLine("Already paused.");
-            }
-
-            public void Stop(MediaPlayerContext context)
-            {
-                Console.WriteLine("Stopping the media player from pause.");
-                context.SetState(new StoppedState());
+                visitor.Visit(this);
+                foreach (var eleman in Elemanlar)
+                {
+                    eleman.Accept(visitor);
+                }
             }
         }
 
-        public class StoppedState : IMediaPlayerState
+        // Boyut Hesaplama Ziyaretçisi
+        public class BoyutHesaplaVisitor : IVisitor
         {
-            public void Play(MediaPlayerContext context)
+            public int ToplamBoyut { get; private set; }
+
+            public void Visit(Dosya dosya)
             {
-                Console.WriteLine("Starting the media player.");
-                context.SetState(new PlayingState());
+                ToplamBoyut += dosya.Boyut;
             }
 
-            public void Pause(MediaPlayerContext context)
+            public void Visit(Klasor klasor)
             {
-                Console.WriteLine("Cannot pause. The media player is stopped.");
+                // Klasörlerde ayrıca boyut eklemiyoruz, sadece içindeki elemanları hesaplıyoruz
+            }
+        }
+
+        // Detay Görüntüleme Ziyaretçisi
+        public class DetayGoruntuleVisitor : IVisitor
+        {
+            private int _indentLevel = 0;
+
+            public void Visit(Dosya dosya)
+            {
+                Console.WriteLine(new string(' ', _indentLevel * 2) + $"- Dosya: {dosya.Ad}, Boyut: {dosya.Boyut}KB");
             }
 
-            public void Stop(MediaPlayerContext context)
+            public void Visit(Klasor klasor)
             {
-                Console.WriteLine("Already stopped.");
+                Console.WriteLine(new string(' ', _indentLevel * 2) + $"+ Klasör: {klasor.Ad}");
+                _indentLevel++;
+                foreach (var eleman in klasor.Elemanlar)
+                {
+                    eleman.Accept(this);
+                }
+                _indentLevel--;
             }
         }
     }
