@@ -5,7 +5,6 @@ using System.Runtime.InteropServices;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
-using static design_pattern_exams.Program.CayDemleme;
 
 namespace design_pattern_exams
 {
@@ -13,60 +12,66 @@ namespace design_pattern_exams
     {
         static void Main(string[] args)
         {
-            //siyah çay demlemek için bir nesne oluşturuluyor
-            CayDemleme siyahCay = new SiyahCay();
-            siyahCay.Demle();
+            SohbetArabulucu sohbet= new SohbetArabulucu();
+            Katilimci ayse = new Katilimci("Ayşe", sohbet);
+            Katilimci mehmet= new Katilimci("Mehmet",sohbet);
 
-            Console.WriteLine();
+            sohbet.KatilimciEkle(ayse);
+            sohbet.KatilimciEkle(mehmet);
 
-            //yeşil çay demlemek için bir nesne oluşturuluyor
-            CayDemleme yesilCay = new YesilCay();
-            yesilCay.Demle();
+            ayse.MesajGonder("Selam");
            
             Console.ReadLine();
 
         }
 
-        //çay demleme şablonu
-        public abstract class CayDemleme
+        public interface IArabulucu
         {
-            //algoritmanın şablon metodu. Bu metodun adımları sabittir
-            public void Demle()
+            void MesajGonder(Katilimci gonderen, string mesaj);
+        }
+
+
+        //katılımcı sınıfı
+        public class Katilimci
+        {
+            private readonly IArabulucu _arabulucu;
+            public string Isim { get; }
+
+            public Katilimci(string isim, IArabulucu arabulucu)
             {
-                SuIsit();
-                CayEkle();
-                SogumayaBirak();
+                Isim= isim;
+                _arabulucu = arabulucu;
             }
 
-            //sabit adımlar
-            protected void SuIsit()
+            public void MesajGonder(string mesaj)
             {
-                Console.WriteLine("Su ısıtıldı.");
+                _arabulucu.MesajGonder(this,mesaj);
             }
 
-            protected void SogumayaBirak()
+            public void MesajAl(string mesaj)
             {
-                Console.WriteLine("Çay demleniyor");
+                Console.WriteLine($"{Isim} mesaj aldı: {mesaj}");
+            }
+        }
+
+
+        public class SohbetArabulucu: IArabulucu
+        {
+            private List<Katilimci> _katilimcilar =new List<Katilimci>();
+
+            public void KatilimciEkle(Katilimci katilimci)
+            {
+                _katilimcilar.Add(katilimci);
             }
 
-            //alt sınıfların özelleştiriliceği adım
-            protected abstract void CayEkle();
-
-            public class SiyahCay: CayDemleme
+            public void MesajGonder(Katilimci gonderen, string mesaj)
             {
-                //alt sınıf, şablondaki soyut metodu kendisine özel bir şekilde implement eder.
-                protected override void CayEkle()
+                foreach(var katilimci in _katilimcilar)
                 {
-                    Console.WriteLine("Siyah çay eklendi.");
-                }
-            }
-
-            public class YesilCay : CayDemleme
-            {
-                //yeşil çay için farklı çay ekleme işlemi
-                protected override void CayEkle()
-                {
-                    Console.WriteLine("Yeşil çay eklendi.");
+                    if(katilimci != gonderen)
+                    {
+                        katilimci.MesajAl($"{gonderen.Isim}: {mesaj}");
+                    }
                 }
             }
         }
