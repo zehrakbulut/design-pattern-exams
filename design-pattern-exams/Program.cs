@@ -7,78 +7,88 @@ namespace design_pattern_exams
     {
         static void Main(string[] args)
         {
-            // Koleksiyonu yaratıyoruz
-            Collection collection = new Collection();
+            // Oyun karakteri oluşturuluyor
+            GameCharacter character = new GameCharacter("Player1", 100, "Start");
 
-            IIterator iterator = collection.CreateIterator();
+            // Caretaker (bakıcı) nesnesi oluşturuluyor
+            GameCaretaker caretaker = new GameCaretaker();
 
-            while (iterator.HasNext())
-            {
-                Console.WriteLine(iterator.Next());
-            }
+            caretaker.SaveState(character.SaveState());
+
+            // Karakterin durumu değiştiriliyor
+            character.Health = 80;
+            character.Position = "Battlefield";
+
+            caretaker.SaveState(character.SaveState());
+
+            // Durum geri alınıyor
+            character.RestoreState(caretaker.GetLastState());
+            Console.WriteLine($"Character Health: {character.Health}, Position: {character.Position}");
+
+            // En eski duruma geri dönülüyor
+            character.RestoreState(caretaker.GetLastState());
+            Console.WriteLine($"Character Health: {character.Health}, Position: {character.Position}");
 
             Console.ReadLine();
         }
 
-        // Koleksiyonun arayüzü
-        public interface IAggregate
+        public class GameCharacter
         {
-            IIterator CreateIterator(); // Yineleyici yaratmak için bir metod
+            public string Name { get; set; }
+            public int Health { get; set; }
+            public string Position { get; set; }
+
+            public GameCharacter(string name, int health, string position)
+            {
+                Name = name;
+                Health = health;
+                Position = position;
+            }
+
+            // Memento oluşturma
+            public Memento SaveState()
+            {
+                return new Memento(Health, Position);
+            }
+
+            // Memento ile durumu geri yükleme
+            public void RestoreState(Memento memento)
+            {
+                this.Health = memento.Health;
+                this.Position = memento.Position;
+            }
         }
 
-        // Koleksiyonun somut sınıfı
-        public class Collection : IAggregate
+        public class Memento
         {
-            private List<string> _items = new List<string>();
+            // İç durumu tutar
+            public int Health { get; private set; }
+            public string Position { get; private set; }
 
-            public Collection()
+            public Memento(int health, string position)
             {
-                _items.Add("elma");
-                _items.Add("armut");
-                _items.Add("muz");
-                _items.Add("çilek");
+                Health = health;
+                Position = position;
             }
-
-            public IIterator CreateIterator()
-            {
-                return new ConcreteIterator(this); // Yineleyici döndür
-            }
-
-            public int Count => _items.Count; // Koleksiyon eleman sayısı
-            public string this[int index] => _items[index]; // İndeksleyici
         }
 
-        // Yineleyici arayüzü
-        public interface IIterator
+        public class GameCaretaker
         {
-            bool HasNext(); // Bir sonraki eleman var mı?
-            object Next();  // Bir sonraki elemana geç
+            private Stack<Memento> _history = new Stack<Memento>();
+
+            // Durumu kaydetme
+            public void SaveState(Memento memento)
+            {
+                _history.Push(memento);
+            }
+
+            // En son kaydedilen durumu alma
+            public Memento GetLastState()
+            {
+                return _history.Count > 0 ? _history.Pop() : null;
+            }
         }
 
-        // Somut Yineleyici
-        public class ConcreteIterator : IIterator
-        {
-            private Collection _collection;
-            private int _current = 0;
 
-            public ConcreteIterator(Collection collection)
-            {
-                _collection = collection;
-            }
-
-            public bool HasNext()
-            {
-                return _current < _collection.Count; // Sonraki eleman var mı?
-            }
-
-            public object Next()
-            {
-                if (HasNext())
-                {
-                    return _collection[_current++]; // Bir sonraki elemanı döndür
-                }
-                return null; // Sonraki eleman yoksa null döner
-            }
-        }
     }
 }
