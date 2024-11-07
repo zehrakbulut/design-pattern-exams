@@ -12,122 +12,62 @@ namespace design_pattern_exams
     {
         static void Main(string[] args)
         {
-            Cihaz televizyon = new Televizyon();
-            Cihaz radyo = new Radyo();
+            HavaDurumu havaDurumu = new HavaDurumu();
+            HaberKanal kanal1 = new HaberKanal("kanal 1");
+            HaberKanal kanal2 = new HaberKanal("kanal 2");
 
-            Kumanda tvKumanda = new Kumanda(televizyon);
-            GelismisKumanda radyoKumanda = new GelismisKumanda(radyo);
+            havaDurumu.GozlemciEkle(kanal1);
+            havaDurumu.GozlemciEkle(kanal2);
 
-            //tv aç/kapat
-            tvKumanda.AcKapat();
-
-            //radyoyu aç, ses seviyesini ayarla
-            radyoKumanda.AcKapat();
-            radyoKumanda.SesAyarla(5);
-
-            //tv'yi kapat
-            tvKumanda.AcKapat();
+            havaDurumu.GuncelleHavaDurumu("bugün hava güneşli");
 
             Console.ReadLine();
 
         }
 
-        public interface Cihaz
+        //gözlemci arayüzü
+        public interface IGozlemci
         {
-            void Ac();
-            void Kapat();
-            void SesAyarla(int seviye);
-            bool AcikMi();
+            void Guncelle(string mesaj);
         }
 
-        public class Televizyon : Cihaz
+        //haber kanalı
+        public class HaberKanal : IGozlemci
         {
-            private bool acik = false;
-            private int sesSeviyesi = 0;
-            public void Ac()
+            private string _isim;
+
+            public HaberKanal(string isim)
             {
-                acik = true;
-                Console.WriteLine("televizyon açıldı");
+                _isim = isim;
             }
 
-            public bool AcikMi()
+            public void Guncelle(string mesaj)
             {
-                return acik;        
-            }
-
-            public void Kapat()
-            {
-                acik = false;
-                Console.WriteLine("televizyon kapandı");
-            }
-
-            public void SesAyarla(int seviye)
-            {
-                sesSeviyesi = seviye;
-                Console.WriteLine($"televizyon ses seviyesi {sesSeviyesi} olarak ayarlandı.");
+                Console.WriteLine($"{_isim} kanalı güncellendi: {mesaj}");
             }
         }
 
-        public class Radyo : Cihaz
+        //hava durumu
+        public class HavaDurumu
         {
-            private bool acik = false;
-            private int sesSeviyesi = 0;
+            private List<IGozlemci> gozlemciler = new List <IGozlemci>();
 
-            public void Ac()
+            public void GozlemciEkle(IGozlemci gozlemci)
             {
-                acik=true;
-                Console.WriteLine("radyo açıldı");
+                gozlemciler.Add(gozlemci);
             }
 
-            public bool AcikMi()
+            public void GozlemciSil(IGozlemci gozlemci)
             {
-                return acik;
+                gozlemciler.Remove(gozlemci);
             }
-
-            public void Kapat()
+            
+            public void GuncelleHavaDurumu(string mesaj)
             {
-                acik=false;
-                Console.WriteLine("radyo kapandı");
-            }
-
-            public void SesAyarla(int seviye)
-            {
-                sesSeviyesi = seviye;
-                Console.WriteLine($"Radyo ses seviyesi {sesSeviyesi} olarak ayarlandı");
-            }
-        }
-
-        public class Kumanda
-        {
-            protected Cihaz _cihaz;
-
-            public Kumanda(Cihaz cihaz)
-            {
-                _cihaz = cihaz;
-            }
-
-            public void AcKapat()
-            {
-                if (_cihaz.AcikMi())
+                foreach(var gozlemci in gozlemciler)
                 {
-                    _cihaz.Kapat();
+                    gozlemci.Guncelle(mesaj);
                 }
-                else
-                {
-                    _cihaz.Ac();
-                }
-            }
-        }
-
-        public class GelismisKumanda : Kumanda
-        {
-            public GelismisKumanda(Cihaz cihaz) : base(cihaz)
-            {
-            }
-
-            public void SesAyarla(int seviye)
-            {
-                _cihaz.SesAyarla(seviye);
             }
         }
     }
