@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
+using static design_pattern_exams.Program.CayDemleme;
 
 namespace design_pattern_exams
 {
@@ -12,44 +13,62 @@ namespace design_pattern_exams
     {
         static void Main(string[] args)
         {
-            Kumanda kumanda = new Kumanda();
-            kumanda.KomutUygula(new IsikAcKomut());
-            kumanda.KomutUygula(new IsikKapatKomut());
+            //siyah çay demlemek için bir nesne oluşturuluyor
+            CayDemleme siyahCay = new SiyahCay();
+            siyahCay.Demle();
+
+            Console.WriteLine();
+
+            //yeşil çay demlemek için bir nesne oluşturuluyor
+            CayDemleme yesilCay = new YesilCay();
+            yesilCay.Demle();
            
             Console.ReadLine();
 
         }
 
-        public interface IKomut
+        //çay demleme şablonu
+        public abstract class CayDemleme
         {
-            void Calistir();
-        }
-
-        //ışığı açma komutu
-        public class IsikAcKomut : IKomut
-        {
-            public void Calistir()
+            //algoritmanın şablon metodu. Bu metodun adımları sabittir
+            public void Demle()
             {
-                Console.WriteLine("ışık açıldı");
+                SuIsit();
+                CayEkle();
+                SogumayaBirak();
+            }
+
+            //sabit adımlar
+            protected void SuIsit()
+            {
+                Console.WriteLine("Su ısıtıldı.");
+            }
+
+            protected void SogumayaBirak()
+            {
+                Console.WriteLine("Çay demleniyor");
+            }
+
+            //alt sınıfların özelleştiriliceği adım
+            protected abstract void CayEkle();
+
+            public class SiyahCay: CayDemleme
+            {
+                //alt sınıf, şablondaki soyut metodu kendisine özel bir şekilde implement eder.
+                protected override void CayEkle()
+                {
+                    Console.WriteLine("Siyah çay eklendi.");
+                }
+            }
+
+            public class YesilCay : CayDemleme
+            {
+                //yeşil çay için farklı çay ekleme işlemi
+                protected override void CayEkle()
+                {
+                    Console.WriteLine("Yeşil çay eklendi.");
+                }
             }
         }
-
-        //ışığı kapama komutu
-        public class IsikKapatKomut : IKomut
-        {
-            public void Calistir()
-            {
-                Console.WriteLine("ışık kapandı");
-            }
-        }
-
-        public class Kumanda
-        {
-            public void KomutUygula(IKomut komut)
-            {
-                komut.Calistir();   
-            }
-        }
-
     }
 }
